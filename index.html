@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Tenerife Techno · Estate 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  /* ============================================================
+     CONFIG · DESIGN TOKENS
+     Direzione: "vulcanica" — roccia nera del Teide + bagliore lava.
+     Ogni fazione/promoter ha il suo colore = la chiave di lettura
+     è anche il filtro. È il senso dell'app: tutte le fazioni, un
+     solo flusso, niente escluso.
+     ============================================================ */
+  :root {
+    --bg:        #0B0910;
+    --bg-2:      #120F18;
+    --surface:   #17131F;
+    --surface-2: #1F1A29;
+    --border:    #2A2435;
+    --border-2:  #3A3248;
+    --text:      #F1EEF7;
+    --muted:     #8E879E;
+    --muted-2:   #645C75;
+
+    --lava-a: #FF2E7E;
+    --lava-b: #FFC93C;
+
+    --maxw: 720px;
+    --radius: 14px;
+    --pad: clamp(16px, 4vw, 24px);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(120% 60% at 50% -10%, rgba(255,46,126,0.14), transparent 60%),
+      radial-gradient(90% 40% at 90% 0%, rgba(255,201,60,0.08), transparent 55%),
+      var(--bg);
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--pad); }
+
+  /* ---------- HERO / TESI ---------- */
+  header.hero {
+    padding: clamp(28px, 9vw, 56px) 0 22px;
+  }
+  .eyebrow {
+    font-family: "Space Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .eyebrow .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--lava-a);
+    box-shadow: 0 0 10px var(--lava-a);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+  h1.title {
+    font-family: "Anton", sans-serif;
+    font-weight: 400;
+    font-size: clamp(44px, 15vw, 88px);
+    line-height: 0.88;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    margin: 14px 0 0;
+  }
+  h1.title .accent {
+    background: linear-gradient(100deg, var(--lava-a), var(--lava-b));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .thesis {
+    margin: 16px 0 0;
+    max-width: 30ch;
+    color: var(--muted);
+    font-size: 15px;
+  }
+  .thesis strong { color: var(--text); font-weight: 600; }
+
+  .stats {
+    display: flex;
+    gap: 22px;
+    margin-top: 22px;
+    flex-wrap: wrap;
+  }
+  .stat .n {
+    font-family: "Space Mono", monospace;
+    font-weight: 700;
+    font-size: 26px;
+    line-height: 1;
+  }
+  .stat .l {
+    font-family: "Space Mono", monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+    margin-top: 5px;
+  }
+
+  /* ---------- CONTROLLI STICKY ---------- */
+  .controls {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: linear-gradient(var(--bg) 72%, transparent);
+    padding: 14px 0 10px;
+    backdrop-filter: blur(2px);
+  }
+  .search {
+    position: relative;
+  }
+  .search svg { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+  .search input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font: 500 15px/1 "Inter", sans-serif;
+    padding: 15px 16px 15px 44px;
+    outline: none;
+    transition: border-color .18s, box-shadow .18s;
+  }
+  .search input::placeholder { color: var(--muted-2); }
+  .search input:focus {
+    border-color: var(--lava-a);
+    box-shadow: 0 0 0 3px rgba(255,46,126,0.18);
+  }
+
+  .chips {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chips.genres { margin-top: 6px; }
+  .chips.genres:empty { display: none; }
+  .chips.genres .chip { font-size: 11.5px; padding: 7px 12px; }
+  .chip {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 999px;
+    padding: 8px 13px;
+    font: 600 12.5px/1 "Inter", sans-serif;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: border-color .15s, color .15s, background .15s;
+    user-select: none;
+  }
+  .chip .swatch { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; }
+  .chip[aria-pressed="true"] {
+    color: #07060A;
+    background: var(--c, var(--text));
+    border-color: var(--c, var(--text));
+  }
+  .chip[aria-pressed="true"] .swatch { background: #07060A !important; opacity: .5; }
+  .chip.all[aria-pressed="true"] { background: var(--text); border-color: var(--text); }
+
+  /* ---------- FEED ---------- */
+  main { padding-bottom: 60px; }
+  .feed-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin: 18px 0 12px;
+  }
+  .feed-head h2 {
+    font: 700 13px/1 "Space Mono", monospace;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0;
+  }
+  .feed-head .count { font: 700 13px "Space Mono", monospace; color: var(--text); }
+
+  .card {
+    position: relative;
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--c, var(--border-2));
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+    text-decoration: none;
+    color: inherit;
+    overflow: hidden;
+    transition: border-color .18s, transform .18s, background .18s;
+  }
+  .card::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(140% 120% at 0% 0%, color-mix(in srgb, var(--c) 12%, transparent), transparent 45%);
+    pointer-events: none;
+    opacity: .9;
+  }
+  @media (hover: hover) {
+    .card:hover { transform: translateY(-2px); border-color: var(--border-2); background: var(--surface-2); }
+  }
+  .card:focus-visible { outline: 2px solid var(--lava-a); outline-offset: 2px; }
+
+  .date {
+    text-align: center;
+    align-self: start;
+  }
+  .date .d { font: 700 30px/0.9 "Space Mono", monospace; color: var(--c, var(--text)); }
+  .date .m {
+    font: 400 11px/1 "Space Mono", monospace;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  .date .tba {
+    font: 700 13px/1 "Space Mono", monospace;
+    color: var(--c, var(--text));
+    letter-spacing: 0.05em;
+  }
+  .date .rec {
+    display: flex; justify-content: center;
+    color: var(--c, var(--text));
+  }
+  .date .rec svg { width: 26px; height: 26px; }
+
+  .body { min-width: 0; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .tag {
+    font: 700 10px/1 "Space Mono", monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 5px 8px;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--c) 18%, transparent);
+    color: var(--c);
+    border: 1px solid color-mix(in srgb, var(--c) 35%, transparent);
+  }
+  .tag.status {
+    background: transparent;
+    color: var(--muted);
+    border-color: var(--border-2);
+  }
+  .name {
+    font-family: "Anton", sans-serif;
+    font-weight: 400;
+    font-size: clamp(20px, 5.6vw, 26px);
+    line-height: 1;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    margin: 0 0 8px;
+  }
+  .meta { display: flex; flex-direction: column; gap: 5px; }
+  .meta .row {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13.5px; color: var(--muted);
+  }
+  .meta .row svg { flex: 0 0 auto; color: var(--muted-2); }
+  .meta .row.genre { color: var(--text); font-weight: 500; }
+  .meta .row.artists {
+    font: 400 12.5px/1.45 "Inter", sans-serif;
+    color: var(--muted);
+    padding-left: 23px;
+  }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    font: 700 12px/1 "Space Mono", monospace;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 9px 13px;
+    border-radius: 9px;
+    border: 1px solid transparent;
+    transition: transform .12s, opacity .15s, background .15s;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn.primary {
+    color: #07060A;
+    background: var(--c, var(--text));
+  }
+  .btn.ig {
+    color: var(--text);
+    border-color: var(--border-2);
+    background: var(--surface-2);
+  }
+  .btn svg { flex: 0 0 auto; }
+  .btn:focus-visible { outline: 2px solid var(--lava-a); outline-offset: 2px; }
+  .card.past { opacity: 0.55; }
+
+  .empty {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--muted);
+  }
+  .empty .big { font-family: "Anton"; font-size: 28px; color: var(--text); text-transform: uppercase; margin-bottom: 8px; }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 22px 0 40px;
+    color: var(--muted-2);
+    font: 400 12px/1.6 "Space Mono", monospace;
+  }
+  footer .src { color: var(--muted); }
+  footer a { color: var(--muted); }
+
+  /* entrata */
+  .card { animation: rise .45s cubic-bezier(.2,.7,.2,1) backwards; }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="eyebrow"><span class="dot"></span> Tenerife · Estate 2026 · Calendario unificato</div>
+      <h1 class="title">RAVE<br><span class="accent">SENZA FAZIONI</span></h1>
+      <p class="thesis"><strong>Un solo calendario, tutte le fazioni.</strong> Gli aggregatori commerciali tagliano ~60% degli eventi per esclusive e guerre tra promoter. Qui non manca niente — da Farra World all'underground puro.</p>
+      <div class="stats">
+        <div class="stat"><div class="n" id="stat-events">—</div><div class="l">Eventi</div></div>
+        <div class="stat"><div class="n" id="stat-promoters">—</div><div class="l">Fazioni</div></div>
+        <div class="stat"><div class="n" id="stat-months">—</div><div class="l">Mesi</div></div>
+      </div>
+    </header>
+
+    <div class="controls">
+      <div class="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="search" type="search" inputmode="search" placeholder="Cerca artista, location o genere…" autocomplete="off" />
+      </div>
+      <div class="chips" id="chips"></div>
+      <div class="chips genres" id="genre-chips"></div>
+    </div>
+
+    <main>
+      <div class="feed-head">
+        <h2>In ordine cronologico</h2>
+        <span class="count" id="count">0</span>
+      </div>
+      <div id="feed"></div>
+    </main>
+
+    <footer>
+      <div class="src" id="source-note">Fonte dati: locale</div>
+      <div>Aggiornato manualmente · unione di tutte le biglietterie. Bigliettazione gestita dai singoli promoter.</div>
+    </footer>
+  </div>
+
+<script>
+/* ============================================================
+   1) SORGENTE DATI
+   ------------------------------------------------------------
+   Lascia DATA_URL = "" per usare i dati locali qui sotto (SEED).
+   Per andare in TEMPO REALE da Google Sheets, pubblica il foglio
+   e incolla qui l'endpoint JSON (vedi istruzioni nella chat).
+   Esempio opensheet:
+   const DATA_URL = "https://opensheet.elk.sh/IL_TUO_ID_FOGLIO/Eventi";
+   Le intestazioni del foglio devono combaciare con le chiavi SEED.
+   ============================================================ */
+const DATA_URL = "https://opensheet.elk.sh/1PShwYNO7ASYzjmVFgkyU0D2PFtOJpZmaaQUQ1o-0Q0k/eventi";
+
+/* Dati di partenza (estate 2026). Stesse chiavi = colonne del foglio.
+   "instagram" è opzionale: se presente, compare un secondo pulsante. */
+const SEED = [
+  { nome:"La Misa", promoter:"farra", giorno:27, mese:"Giu", anno:2026, genere:"Tech House / Techno Underground", location:"Golf Costa Adeje", artisti:"", link:"https://farra.world", instagram:"https://instagram.com/farra.world", stato:"" },
+  { nome:"NRG Tenerife", promoter:"nrg", giorno:12, mese:"Giu", anno:2026, genere:"Hard Techno (3 giorni - 4 venue)", location:"Hard Rock Hotel / Magma / Xanadu", artisti:"Kobosil, Hannah Laing, Fantasm, Vendex", link:"https://www.nrg-raves.com", instagram:"https://instagram.com/nrg_raves", stato:"" },
+  { nome:"Opening Flirt", promoter:"papagayo", giorno:22, mese:"Giu", anno:2026, genere:"Hip-hop / Reggaeton / Latin", location:"Papagayo Tenerife", artisti:"", link:"https://xceed.me/en/tenerife/event/opening-flirt-mon-22nd-june-2026/229817", instagram:"", stato:"" },
+  { nome:"Move On - Rossi.", promoter:"papagayo", giorno:24, mese:"Giu", anno:2026, genere:"House / Funky", location:"Papagayo Tenerife", artisti:"Rossi.", link:"https://xceed.me/en/tenerife/events", instagram:"", stato:"" },
+  { nome:"Opening Descaro x Follow", promoter:"papagayo", giorno:25, mese:"Giu", anno:2026, genere:"Latin Tech / Afro House", location:"Papagayo Tenerife", artisti:"", link:"https://xceed.me/en/tenerife/events", instagram:"", stato:"" },
+  { nome:"The Hype - Sala El Nido", promoter:"papagayo", giorno:25, mese:"Giu", anno:2026, genere:"Tech House", location:"Sala El Nido (Papagayo)", artisti:"", link:"https://xceed.me/en/tenerife/events", instagram:"", stato:"" },
+  { nome:"Nómadas - Sala El Nido", promoter:"papagayo", giorno:26, mese:"Giu", anno:2026, genere:"Tech House", location:"Sala El Nido (Papagayo)", artisti:"Emanuele Inglese", link:"https://xceed.me/en/tenerife/event/nomadas-sala-el-nido-fri-26th-june-2026/232702", instagram:"", stato:"" },
+  { nome:"La Loka en el Circo", promoter:"papagayo", giorno:26, mese:"Giu", anno:2026, genere:"Reggaeton / Latin", location:"Papagayo Tenerife", artisti:"", link:"https://xceed.me/en/tenerife/events", instagram:"", stato:"" },
+  { nome:"Essence", promoter:"essence", giorno:27, mese:"Giu", anno:2026, genere:"House / Tech House", location:"Papagayo Tenerife", artisti:"", link:"https://xceed.me/en/tenerife/events", instagram:"", stato:"" },
+  { nome:"Hija De Fruta - Sala El Nido", promoter:"papagayo", giorno:27, mese:"Giu", anno:2026, genere:"Latin / Reggaeton", location:"Sala El Nido (Papagayo)", artisti:"", link:"https://xceed.me/en/tenerife/events", instagram:"", stato:"" },
+  { nome:"Ilario Alicante - Piknik", promoter:"papagayo", giorno:28, mese:"Giu", anno:2026, genere:"Tech House / Techno", location:"Papagayo Tenerife", artisti:"Ilario Alicante", link:"https://xceed.me/en/tenerife/event/ilario-alicante-piknik-sun-28th-june-2026/228449", instagram:"", stato:"" },
+  { nome:"Flirt", promoter:"papagayo", giorno:29, mese:"Giu", anno:2026, genere:"Hip-hop / Reggaeton", location:"Papagayo Tenerife", artisti:"", link:"https://xceed.me/en/tenerife/events", instagram:"", stato:"" },
+  { nome:"Move On", promoter:"papagayo", giorno:1, mese:"Lug", anno:2026, genere:"House", location:"Papagayo Tenerife", artisti:"", link:"https://xceed.me/en/tenerife/events", instagram:"", stato:"" },
+  { nome:"Opening Cacao x Follow", promoter:"papagayo", giorno:2, mese:"Lug", anno:2026, genere:"Latin Tech", location:"Papagayo Tenerife", artisti:"", link:"https://xceed.me/en/tenerife/events", instagram:"", stato:"" },
+  { nome:"Essence w/ Andrea Oliva", promoter:"essence", giorno:4, mese:"Lug", anno:2026, genere:"Tech House", location:"Papagayo Tenerife", artisti:"Andrea Oliva", link:"https://xceed.me/en/tenerife/events", instagram:"", stato:"" },
+  { nome:"Papagayo x Tribu Beach", promoter:"papagayo", giorno:5, mese:"Lug", anno:2026, genere:"Beach / House", location:"Papagayo Tenerife", artisti:"", link:"https://xceed.me/en/tenerife/events", instagram:"", stato:"" },
+  { nome:"Marsolo - Piknik", promoter:"papagayo", giorno:5, mese:"Lug", anno:2026, genere:"Tech House", location:"Papagayo Tenerife", artisti:"Marsolo", link:"https://xceed.me/en/tenerife/events", instagram:"", stato:"" },
+  { nome:"VOYAGE Boat Party", promoter:"papagayo", giorno:5, mese:"Lug", anno:2026, genere:"Boat Party / House", location:"Tenerife", artisti:"Mindout", link:"https://xceed.me/en/tenerife/events", instagram:"", stato:"" },
+  { nome:"Flirt", promoter:"papagayo", giorno:6, mese:"Lug", anno:2026, genere:"Hip-hop / Reggaeton", location:"Papagayo Tenerife", artisti:"", link:"https://xceed.me/en/tenerife/events", instagram:"", stato:"" },
+  { nome:"MVSON", promoter:"papagayo", giorno:8, mese:"Lug", anno:2026, genere:"House", location:"Papagayo Tenerife", artisti:"", link:"https://xceed.me/en/tenerife/events", instagram:"", stato:"" },
+  { nome:"PikNik w/ Archie Hamilton", promoter:"papagayo", giorno:12, mese:"Lug", anno:2026, genere:"Minimal / Deep Tech", location:"Papagayo Tenerife", artisti:"Archie Hamilton", link:"https://xceed.me/en/tenerife/events", instagram:"", stato:"" },
+  { nome:"Flirt", promoter:"papagayo", giorno:27, mese:"Lug", anno:2026, genere:"Hip-hop / Reggaeton", location:"Papagayo Tenerife", artisti:"", link:"https://xceed.me/en/tenerife/events", instagram:"", stato:"" },
+  { nome:"MAPPA Festival", promoter:"greenworld", giorno:10, mese:"Lug", anno:2026, genere:"Tech House / Minimal Techno", location:"Anfiteatro Siam Park", artisti:"", link:"https://xceed.me", instagram:"", stato:"" },
+  { nome:"BlackWorks Festival", promoter:"blackworks", giorno:25, mese:"Lug", anno:2026, genere:"Hard Techno / Industrial", location:"Magma Arte & Congresos", artisti:"", link:"https://instagram.com", instagram:"", stato:"" },
+  { nome:"La Loka w/ José de las Heras", promoter:"papagayo", giorno:7, mese:"Ago", anno:2026, genere:"Reggaeton / Latin", location:"Papagayo Tenerife", artisti:"José de las Heras", link:"https://xceed.me/en/tenerife/events", instagram:"", stato:"" },
+  { nome:"Sunblast Festival", promoter:"farra", giorno:8, mese:"Ago", anno:2026, genere:"Techno / Bass / EDM (5 Stage)", location:"Golf Costa Adeje", artisti:"", link:"https://farra.world", instagram:"https://instagram.com/farra.world", stato:"" },
+  { nome:"GreenWorld Festival", promoter:"greenworld", giorno:15, mese:"Ago", anno:2026, genere:"Techno Purista / Groove", location:"Golf del Sur", artisti:"", link:"https://greenworldfestival.eu", instagram:"", stato:"" },
+  { nome:"Noctámbula", promoter:"noctambula", giorno:12, mese:"Set", anno:2026, genere:"Melodic / Mainstage Elettronica", location:"Recinto Ferial - Santa Cruz", artisti:"Symphony of Unity, Meduza (Matt), B Jones", link:"https://www.noctambulatenerife.com", instagram:"", stato:"" },
+  { nome:"Ravers Tenerife", promoter:"indie", giorno:18, mese:"Set", anno:2026, genere:"Hardcore / Hard Techno", location:"Castello di San Miguel", artisti:"", link:"https://skiddle.com", instagram:"", stato:"" },
+  { nome:"Elrow XXL Tenerife", promoter:"farra", giorno:null, mese:"Ott", anno:2026, genere:"Tech House / Immersive Party", location:"Golf Costa Adeje", artisti:"", link:"https://farra.world", instagram:"https://instagram.com/farra.world", stato:"tba" },
+  { nome:"Wild Tenerife", promoter:"wild", giorno:null, mese:"", anno:2026, genere:"Disco Lounge / Reggaeton", location:"CC San Telmo - Los Cristianos", artisti:"", link:"https://wildtenerife.es", instagram:"https://www.instagram.com/wild_tenerife", stato:"ricorrente" },
+  { nome:"Mala Mía Club", promoter:"malamia", giorno:null, mese:"", anno:2026, genere:"Urban / Latin / Reggaeton (mar e gio)", location:"Santa Cruz de Tenerife", artisti:"", link:"https://www.instagram.com/malamiaclubtf", instagram:"https://www.instagram.com/malamiaclubtf", stato:"ricorrente" },
+  { nome:"La Central", promoter:"central", giorno:null, mese:"", anno:2026, genere:"Urban Latin / Electronic (2 sale)", location:"CC Starco - Las Américas", artisti:"", link:"https://lacentraldiscoteca.com", instagram:"", stato:"ricorrente" },
+  { nome:"Achamán", promoter:"achaman", giorno:null, mese:"", anno:2026, genere:"Reggaeton / Latin / Salsa", location:"Costa Adeje (Fañabé)", artisti:"", link:"https://achamandisco.com", instagram:"https://www.instagram.com/achamandisco", stato:"ricorrente" },
+  { nome:"Kendo Lounge Bar", promoter:"kendo", giorno:null, mese:"", anno:2026, genere:"Reggaeton / RnB / Lounge (ven e sab)", location:"C. México - Las Américas", artisti:"", link:"https://entradas.ticketlop.es/organizers/kendo-lounge-bar", instagram:"https://www.instagram.com/kendoloungebar", stato:"ricorrente" }
+];
+
+/* ============================================================
+   2) ANAGRAFICA FAZIONI (etichetta + colore).
+   Il foglio deve contenere solo lo slug nella colonna "promoter".
+   ============================================================ */
+const PROMOTERS = {
+  farra:      { label:"Farra World",   color:"#FF2E7E" },
+  greenworld: { label:"GreenWorld",    color:"#7CFF52" },
+  blackworks: { label:"BlackWorks",    color:"#FF5A33" },
+  papagayo:   { label:"Papagayo Beach",color:"#25E0C8" },
+  nrg:        { label:"NRG",           color:"#4D7CFF" },
+  essence:    { label:"Essence",       color:"#2FE08F" },
+  noctambula: { label:"Noctámbula",    color:"#E8B04B" },
+  lostnomads: { label:"Lost Nomads",   color:"#B07CFF" },
+  lagoon:     { label:"Lagoon Party",  color:"#3CC8FF" },
+  wild:       { label:"Wild Tenerife", color:"#FF8A5B" },
+  malamia:    { label:"Mala Mía",      color:"#E84DFF" },
+  central:    { label:"La Central",    color:"#6E8BFF" },
+  achaman:    { label:"Achamán",       color:"#FF9F1C" },
+  kendo:      { label:"Kendo",         color:"#00BFA6" },
+  indie:      { label:"Ravers / Indie",color:"#FFC93C" }
+};
+const FALLBACK_COLORS = ["#FF2E7E","#7CFF52","#FF5A33","#25E0C8","#B07CFF","#3CC8FF","#FFC93C","#FF8AC4"];
+function promoterMeta(slug, i){
+  if (PROMOTERS[slug]) return PROMOTERS[slug];
+  return { label: slug ? slug[0].toUpperCase()+slug.slice(1) : "Altro", color: FALLBACK_COLORS[i % FALLBACK_COLORS.length] };
+}
+
+const MONTHS = ["Gen","Feb","Mar","Apr","Mag","Giu","Lug","Ago","Set","Ott","Nov","Dic"];
+const MONTHS_FULL = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
+function monthIndex(m){
+  if (m == null) return 12;
+  const s = String(m).trim();
+  if (/^\d+$/.test(s)) return Math.max(0, parseInt(s,10)-1);
+  const i = MONTHS.findIndex(x => x.toLowerCase() === s.slice(0,3).toLowerCase());
+  return i >= 0 ? i : 12;
+}
+
+/* ============================================================
+   3) STATO + LOGICA
+   ============================================================ */
+let DATA = [];
+const active = new Set();   // promoter selezionati (vuoto = tutti)
+const activeGenres = new Set(); // macro-generi selezionati (vuoto = tutti)
+let query = "";
+
+// Macro-generi: una chip matcha se la stringa "genere" contiene una parola chiave.
+const GENRES = [
+  { label:"Techno",    kw:["techno","minimal","deep tech","groove"] },
+  { label:"Hard",      kw:["hard techno","hardcore","industrial","schranz"] },
+  { label:"Tech House",kw:["tech house","house"] },
+  { label:"Melodic",   kw:["melodic"] },
+  { label:"Reggaeton", kw:["reggaeton","latin","hip-hop","urban","hits","rnb","afrobeats"] }
+];
+const GENRE_C = "#B7A6FF";
+function eventMatchesGenre(e, g){
+  const s = e.genere.toLowerCase();
+  return g.kw.some(k => s.includes(k));
+}
+
+const $ = s => document.querySelector(s);
+
+function normalize(rows){
+  return rows.map(r => {
+    const giorno = (r.giorno === "" || r.giorno == null) ? null : parseInt(r.giorno,10);
+    const mi = monthIndex(r.mese);
+    return {
+      nome: r.nome || "",
+      promoter: (r.promoter || "indie").trim().toLowerCase(),
+      giorno,
+      mese: r.mese || "",
+      mi,
+      anno: r.anno || 2026,
+      genere: r.genere || "",
+      location: r.location || "",
+      artisti: r.artisti || "",
+      link: r.link || "#",
+      instagram: r.instagram || "",
+      stato: (r.stato || "").trim().toLowerCase(),
+      sortKey: mi * 100 + (giorno == null ? 99 : giorno)
+    };
+  }).sort((a,b) => a.sortKey - b.sortKey);
+}
+
+// Mostra solo eventi da oggi in avanti. I locali fissi ("ricorrente"),
+// i TBA e gli eventi senza data restano sempre visibili.
+function isUpcoming(e){
+  if (e.giorno == null || e.mi == null || e.mi > 11) return true;
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const ev = new Date(Number(e.anno) || 2026, e.mi, e.giorno);
+  return ev >= today;
+}
+
+function activePromoterList(){
+  const seen = [];
+  DATA.forEach(e => { if (!seen.includes(e.promoter)) seen.push(e.promoter); });
+  return seen;
+}
+
+function renderChips(){
+  const box = $("#chips");
+  box.innerHTML = "";
+  const all = document.createElement("button");
+  all.className = "chip all";
+  all.textContent = "Tutte le fazioni";
+  all.setAttribute("aria-pressed", active.size === 0 ? "true" : "false");
+  all.onclick = () => { active.clear(); update(); };
+  box.appendChild(all);
+
+  activePromoterList().forEach((slug, i) => {
+    const meta = promoterMeta(slug, i);
+    const c = document.createElement("button");
+    c.className = "chip";
+    c.style.setProperty("--c", meta.color);
+    c.setAttribute("aria-pressed", active.has(slug) ? "true" : "false");
+    c.innerHTML = `<span class="swatch" style="background:${meta.color}"></span>${meta.label}`;
+    c.onclick = () => { active.has(slug) ? active.delete(slug) : active.add(slug); update(); };
+    box.appendChild(c);
+  });
+}
+
+function renderGenreChips(){
+  const box = $("#genre-chips");
+  box.innerHTML = "";
+  // mostra solo i generi presenti nei dati
+  const present = GENRES.filter(g => DATA.some(e => eventMatchesGenre(e, g)));
+  if (present.length < 2) return; // niente filtro generi se non serve
+  present.forEach(g => {
+    const c = document.createElement("button");
+    c.className = "chip";
+    c.style.setProperty("--c", GENRE_C);
+    c.setAttribute("aria-pressed", activeGenres.has(g.label) ? "true" : "false");
+    c.textContent = g.label;
+    c.onclick = () => { activeGenres.has(g.label) ? activeGenres.delete(g.label) : activeGenres.add(g.label); update(); };
+    box.appendChild(c);
+  });
+}
+
+function matches(e){
+  if (active.size && !active.has(e.promoter)) return false;
+  if (activeGenres.size){
+    const sel = GENRES.filter(g => activeGenres.has(g.label));
+    if (!sel.some(g => eventMatchesGenre(e, g))) return false;
+  }
+  if (!query) return true;
+  const meta = promoterMeta(e.promoter, 0);
+  const hay = [e.nome, e.location, e.genere, e.artisti, meta.label].join(" ").toLowerCase();
+  return query.split(/\s+/).every(t => hay.includes(t));
+}
+
+function icon(name){
+  const p = {
+    pin: '<path d="M12 21s-6-5.2-6-10a6 6 0 0 1 12 0c0 4.8-6 10-6 10Z"/><circle cx="12" cy="11" r="2.2"/>',
+    wave: '<path d="M3 12c2 0 2-3 4-3s2 3 4 3 2-3 4-3 2 3 4 3"/>',
+    arrow: '<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>',
+    repeat: '<path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>',
+    ig: '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/>'
+  }[name];
+  return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+}
+
+function card(e, i){
+  const meta = promoterMeta(e.promoter, i);
+  const recurring = e.stato === "ricorrente";
+  const past = e.stato === "concluso" || e.stato === "past";
+  const noDate = e.giorno == null;
+  const tba = e.stato === "tba" || (noDate && !recurring);
+
+  let dateBlock;
+  if (recurring && noDate) dateBlock = `<div class="rec">${icon('repeat')}</div><div class="m">Serie</div>`;
+  else if (tba)            dateBlock = `<div class="tba">TBA</div><div class="m">${MONTHS[e.mi] || e.mese}</div>`;
+  else                     dateBlock = `<div class="d">${e.giorno}</div><div class="m">${MONTHS[e.mi] || e.mese}</div>`;
+
+  let statusTag = "";
+  if (past) statusTag = `<span class="tag status">Concluso</span>`;
+  else if (tba) statusTag = `<span class="tag status">Data da confermare</span>`;
+  else if (recurring) statusTag = `<span class="tag status">Ricorrente</span>`;
+
+  const isIG = /instagram\.com/.test(e.link);
+  const primaryLabel = isIG ? "Instagram" : (recurring ? "Info" : "Biglietti");
+  const ticketBtn = `<a class="btn primary" href="${e.link}" target="_blank" rel="noopener">${primaryLabel} ${icon(isIG ? 'ig' : 'arrow')}</a>`;
+  const igBtn = (e.instagram && e.instagram !== e.link)
+    ? `<a class="btn ig" href="${e.instagram}" target="_blank" rel="noopener" aria-label="Instagram">${icon('ig')} Flyer</a>` : "";
+
+  return `
+  <div class="card ${past?'past':''}" style="--c:${meta.color}; animation-delay:${Math.min(i,12)*45}ms">
+    <div class="date">${dateBlock}</div>
+    <div class="body">
+      <div class="tags">
+        <span class="tag">${meta.label}</span>
+        ${statusTag}
+      </div>
+      <h3 class="name">${e.nome}</h3>
+      <div class="meta">
+        <div class="row genre">${icon('wave')}<span>${e.genere}</span></div>
+        <div class="row">${icon('pin')}<span>${e.location}</span></div>
+        ${e.artisti ? `<div class="row artists">${e.artisti}</div>` : ""}
+      </div>
+      <div class="actions">${ticketBtn}${igBtn}</div>
+    </div>
+  </div>`;
+}
+
+function update(){
+  renderChips();
+  renderGenreChips();
+  const list = DATA.filter(matches);
+  const feed = $("#feed");
+  if (!list.length){
+    feed.innerHTML = `<div class="empty"><div class="big">Niente qui</div>Nessun evento con questi filtri. Prova a togliere una fazione, un genere o a svuotare la ricerca.</div>`;
+  } else {
+    feed.innerHTML = list.map((e,i)=>card(e,i)).join("");
+  }
+  $("#count").textContent = list.length;
+}
+
+function renderStats(){
+  $("#stat-events").textContent = DATA.length;
+  $("#stat-promoters").textContent = activePromoterList().length;
+  $("#stat-months").textContent = new Set(DATA.map(e=>e.mi).filter(m=>m<12)).size;
+}
+
+/* ricerca */
+$("#search").addEventListener("input", e => { query = e.target.value.trim().toLowerCase(); update(); });
+
+/* ============================================================
+   4) BOOTSTRAP — prova il remoto, altrimenti usa i dati locali
+   ============================================================ */
+async function boot(){
+  let rows = SEED, src = "locale (seed integrato)";
+  if (DATA_URL){
+    try {
+      const res = await fetch(DATA_URL, { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP "+res.status);
+      const json = await res.json();
+      if (Array.isArray(json) && json.length){ rows = json; src = "Google Sheets (live)"; }
+    } catch (err){
+      console.warn("Fetch remoto fallito, uso i dati locali:", err);
+      src = "locale · remoto non raggiungibile";
+    }
+  }
+  DATA = normalize(rows).filter(isUpcoming);
+  $("#source-note").textContent = "Fonte dati: " + src;
+  renderStats();
+  update();
+}
+boot();
+</script>
+</body>
+</html>
