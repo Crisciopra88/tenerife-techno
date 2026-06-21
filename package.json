@@ -1,0 +1,9 @@
+{
+  "name": "tenerife-techno",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "googleapis": "^140.0.0",
+    "cheerio": "^1.0.0"
+  }
+}
